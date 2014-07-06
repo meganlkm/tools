@@ -79,8 +79,8 @@ if (defined $options{m} && isDir($options{m})) {
 
 
 sub usage {
-    print "\033[1mUsage:\033[0m csv2xlsx [options] \"fileone.csv:sheetname,filetwo.csv:sheetname, etc\" [output_file_name]\n";
-    print " options:\n";
+    print "\033[1mUsage:\033[0m\n  csv2xlsx [options] \"fileone.csv:sheetname,filetwo.csv:sheetname,...\" [output_file_name]\n";
+    print "\033[1mOptions:\033[0m\n";
     usage_options();
     exit;
 }
@@ -93,12 +93,10 @@ sub usage_options {
     );
 
     my $firstColWidth = max_str_len_hash_key(\%uopts);
-    my $pformat = '  %-' . ($firstColWidth + 4) . 's';
+    my $pformat = "  \033[1m%-" . ($firstColWidth + 4) . "s\033[0m";
 
     foreach my $k (keys %uopts) {
-        print "\033[1m";
         printf $pformat, '-' . $k;
-        print "\033[0m";
         print $uopts{$k} . "\n";
     }
 }
