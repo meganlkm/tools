@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# python project setup
+
+export ST3_PROJECTS="${HOME}/sublime_projects"
+test -f "${HOME}/.venv_wrapper" && source ${HOME}/.venv_wrapper
+
+if [[ $PROJECT_HOME == ""  ]]; then
+    echo "PROJECT_HOME environment variable is not set";
+    exit;
+fi
+
+# confirm project name - first arg
+script_name=`basename $0`
+prjname=$1
+
+if [[ $prjname == ""  ]]; then
+    echo "Usage: ${script_name} <project_name>";
+    exit;
+fi
+
+# confirm project name is valid
+
+# make sublime text project file
+st3prj="${HOME}/sublime_projects/${prjname}.sublime-project"
+
+# what if project file exists?
+cat > $st3prj <<EOF
+{
+    "folders":
+    [
+        {
+            "name": "${prjname} - source",
+            "follow_symlinks": true,
+            "path": "${PROJECT_HOME}/${prjname}"
+        },
+        {
+            "name": "${prjname} - env",
+            "follow_symlinks": true,
+            "path": "${WORKON_HOME}/${prjname}"
+        }
+    ]
+}
+EOF
+
+
+# run mkproject
+mkproject $prjname
+
+# open project in st3
+subl --project "${ST3_PROJECTS}/${prjname}.sublime-project"
+
+echo "Finished making project ${prjname} in ${PROJECT_HOME}"
