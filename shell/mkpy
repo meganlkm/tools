@@ -1,53 +1,48 @@
 #!/bin/bash
 
-# python project setup
+# TODO py-ify and ansible-fy this
+#       append source .mypystuff to .bash_profile
 
-export ST3_PROJECTS="${HOME}/sublime_projects"
-test -f "${HOME}/.venv_wrapper" && source ${HOME}/.venv_wrapper
+function get_st3_prj_file() {
+    printf "${HOME}/sublime_projects/${@}.sublime-project"
+}
 
-if [[ $PROJECT_HOME == ""  ]]; then
-    echo "PROJECT_HOME environment variable is not set";
-    exit;
-fi
+function mkst3prj() {
+    prj=$@
+    st3prj=$(get_st3_prj_file ${prj})
+    # what if project file exists?
+    if [[ -f $st3prj ]]; then
+        echo "project file already exists: [${st3prj}]";
+        return 0;
+    fi
 
-# confirm project name - first arg
-script_name=`basename $0`
-prjname=$1
-
-if [[ $prjname == ""  ]]; then
-    echo "Usage: ${script_name} <project_name>";
-    exit;
-fi
-
-# confirm project name is valid
-
-# make sublime text project file
-st3prj="${HOME}/sublime_projects/${prjname}.sublime-project"
-
-# what if project file exists?
-cat > $st3prj <<EOF
+    # TODO convert this to a template
+    cat > $st3prj <<EOF
 {
     "folders":
     [
         {
-            "name": "${prjname} - source",
+            "name": "${prj} - source",
             "follow_symlinks": true,
-            "path": "${PROJECT_HOME}/${prjname}"
+            "path": "${PROJECT_HOME}/${prj}"
         },
         {
-            "name": "${prjname} - env",
+            "name": "${prj} - env",
             "follow_symlinks": true,
-            "path": "${WORKON_HOME}/${prjname}"
+            "path": "${WORKON_HOME}/${prj}"
         }
     ]
 }
 EOF
+    echo "cat ${st3prj}"
+}
 
+function mkpy() {
+    myprj=$@
+    # TODO confirm project name is valid
 
-# run mkproject
-mkproject $prjname
-
-# open project in st3
-subl --project "${ST3_PROJECTS}/${prjname}.sublime-project"
-
-echo "Finished making project ${prjname} in ${PROJECT_HOME}"
+    if [[ $(mkst3prj $myprj) ]]; then
+        mkproject $myprj
+        subl --project "$(get_st3_prj_file $myprj)"
+    fi
+}
